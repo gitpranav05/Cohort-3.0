@@ -27,9 +27,9 @@
 
 // console.log(date.toLocaleDateString());
 
-const mpp = new Map();
+// const mpp = new Map();
 
-mpp.set("Como", "How");
-mpp.set("Hello", 123);
+// mpp.set("Como", "How");
+// mpp.set("Hello", 123);
 
-console.log(mpp.get("Hello"));
+// console.log(mpp.get("Hello"));
