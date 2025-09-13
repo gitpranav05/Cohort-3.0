@@ -80,47 +80,54 @@
 // const { randomBytes } = require("crypto");
 // const fs= require("fs")
 
-function printm(err,dadfgfgfxght) {
-        console.log(dadfgfgfxght);
-    }
+// function printm(err,dadfgfgfxght) {
+//         console.log(dadfgfgfxght);
+//     }
     
 //     fs.readFile("a.txt","utf-8", print);
 //     fs.readFile("b.txt","utf-8", print);
     
 //     console.log("HOLA");
     
-const fs = require("fs");
 
-function random(resolve){
-  resolve(); 
-  fs.readFile("a.txt","utf-8", printm);
-}
-
-function readFilePromisified(fi) {
-  return new Promise(random);
-}
-
-function print() {
-  console.log("File read nigga");
-}
-
-const fi = "a.txt"
-
-readFilePromisified(fi).then(print);
 
 // function asd() {
-//   console.log("Hello");
+  //   console.log("Hello");
+  // }
+  
+  // function random(asd){
+    //   asd();
+    // }
+    
+    // let p = new Promise(random);
+    
+    // function kaacha() {
+      //   console.log("Promised");
+      // }
+      
+      // p.then(kaacha)
+      
+// const fs = require("fs");
+
+// function readFiler(resolve,reject){
+//   fs.readFile("a.txt","utf-8",(err,data)=>{
+//     if(err) reject(err);
+//     else resolve(data);
+//   });
 // }
 
-// function random(asd){
-//   asd();
+// function readFilePromise(){
+//   return new Promise(readFiler)
 // }
 
-// let p = new Promise(random);
 
-// function kaacha() {
-//   console.log("Promised");
-// }
+// readFilePromise()
+//   .then((data)=>{
+//     console.log(data);
+//   })
 
-// p.then(kaacha)
 
+fetch("https://v2.jokeapi.dev/joke/Programming?blacklistFlags=nsfw,religious")
+  .then((res) => res.json())
+  .then((data) => console.log(data))
+  .catch((err) => console.error(err));
