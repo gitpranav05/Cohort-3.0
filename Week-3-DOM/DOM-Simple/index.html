@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <title>
+            DOM Easy
+        </title>
+    </head>
+    <body>
+        <div id="topDiv">
+            <h1>To-Do List</h1>
+            <input type="text" name="" placeholder="Enter Todo..." id="">
+            <button onclick="addTodo()">Submit</button>
+        </div>
+    </body>
+
+    <script>
+        function addTodo(){
+            const inp = document.querySelector("input");
+            const value = inp.value;
+
+            const newDiv = document.createElement("div");
+            const drv= "<div display: flex>" + value + "<button>Delete</button></div> "
+            newDiv.innerHTML= drv;
+
+            document.querySelector("#topDiv").appendChild(newDiv)
+
+            inp.value="";
+        }
+    </script>
+</html>
