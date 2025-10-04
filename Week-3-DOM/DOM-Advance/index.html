@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DOM-Complex</title>
+  </head>
+  <body>
+    <div id="dev">
+      <h1>Todo List</h1>
+      <div style="display: flex">
+        <input type="text" placeholder="Enter Todo..." />
+        <button onclick="addTodo()">Submit</button>
+      </div>
+    </div>
+    <div id="todo"></div>
+
+    <script>
+      let todos = [];
+      let cnt = 0;
+
+      function delTodo(id) {
+        todos.splice(id, 1);
+        render();
+      }
+
+      function addTodo() {
+        todos.push({
+          id: cnt,
+          title: document.querySelector("input").value,
+        });
+        render();
+        cnt++;
+      }
+
+      function render() {
+        const dev = document.querySelector("#todo");
+        dev.innerHTML="";
+
+        for (let i = 0; i < todos.length; i++) {
+          const todo = todos[i];
+
+          const divEl = document.createElement("div");
+          const h4El = document.createElement("h4");
+          const button = document.createElement("button");
+
+          h4El.innerHTML = todo.title;
+          button.innerHTML = "Delete";
+          button.setAttribute("onclick", "delTodo("+i+")");
+
+          divEl.appendChild(h4El);
+          divEl.appendChild(button);
+
+          document.querySelector("#todo").appendChild(divEl);
+        }
+      }
+    </script>
+  </body>
+</html>
