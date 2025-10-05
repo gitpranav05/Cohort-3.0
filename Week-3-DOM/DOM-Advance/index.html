@@ -16,21 +16,30 @@
     <div id="todo"></div>
 
     <script>
-      let todos = [];
-      let cnt = 0;
+      let todos = JSON.parse(localStorage.getItem("todos")) || [];
+      let cnt = todos.length;
+
+      function saveTodo(){
+        localStorage.setItem("todos", JSON.stringify(todos));
+      }
 
       function delTodo(id) {
         todos.splice(id, 1);
+        saveTodo();
         render();
       }
 
       function addTodo() {
+        const inp = document.querySelector("input");
+        const tit = inp.value
         todos.push({
           id: cnt,
-          title: document.querySelector("input").value,
+          title: tit
         });
-        render();
         cnt++;
+        saveTodo(); 
+        render();
+        inp.value=""
       }
 
       function render() {
@@ -54,6 +63,7 @@
           document.querySelector("#todo").appendChild(divEl);
         }
       }
+      render();
     </script>
   </body>
 </html>

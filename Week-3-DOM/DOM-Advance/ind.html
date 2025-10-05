@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DOM Complex</title>
+  </head>
+  <body>
+    <div>
+      <h1>To-Do List</h1>
+      <div>
+        <input type="text" id="inp" placeholder="Enter todo..." />
+        <button onclick="addTodo()">Submit</button>
+        <button onclick="delAll()">Delete all</button>
+      </div>
+    </div>
+    <div id="list"></div>
+
+    <script>
+      let todos = JSON.parse(localStorage.getItem("todos")) ||  [];
+      cnt = todos.length;
+
+      function delAll(){
+        todos.splice(0, todos.length);
+        saveTodo();
+        render();
+
+      }
+
+      function delTodo(id) {
+        todos.splice(id,1);
+        saveTodo();
+        render();
+      }
+
+      function saveTodo(){
+        localStorage.setItem("todos", JSON.stringify(todos));
+      }
+
+      function addTodo() {
+        const inpel = document.getElementById("inp");
+        const tit = inpel.value;
+        if(tit.trim() === ""){
+            alert("Enter a valid To-DO");
+            return;
+        }
+        inpel.value = "";
+        todos.push({ tit : tit });
+        cnt++;
+        render();
+        saveTodo();
+      }
+
+      function render() {
+        const list = document.getElementById("list");
+        list.innerHTML = "";
+        for (let i = 0; i < todos.length; i++) {
+          const divEl = document.createElement("div");
+          const h4El = document.createElement("h4");
+          const buttonEl = document.createElement("button");
+
+          h4El.innerHTML = i+1+". "+todos[i].tit;
+          buttonEl.innerHTML = "Delete";
+          buttonEl.setAttribute("onclick", "delTodo("+i+")");
+          divEl.appendChild(h4El);
+          divEl.appendChild(buttonEl);
+
+          list.appendChild(divEl);
+        }
+      }
+      render();
+    </script>
+  </body>
+</html>
