@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+    <div>
+      <h1>To-Do App</h1>
+    </div>
+
+    <div id="login">
+      <div>
+        <input id="un1" type="text" placeholder="username" />
+        <input id="ps1" type="password" placeholder="password" />
+        <button onclick="signup()">Sign-Up</button>
+      </div>
+
+      <div style="padding-top: 20px">
+        <input id="un2" type="text" placeholder="username" />
+        <input id="ps2" type="password" placeholder="password" />
+        <button onclick="signin()">Sign-In</button>
+      </div>
+    </div>
+
+    <div id="logo">
+      <h1>User Information:</h1>
+      <div id="we"></div>
+      <button onclick="logout()">Logout</button>
+    </div>
+
+    <div id="main" style="padding-top: 20px">
+      <div>
+        <h1>Add To-Do</h1>
+        <input id="ip" type="text" />
+        <button onclick="subHandler()">Submit</button>
+
+        <div id="todos"></div>
+      </div>
+    </div>
+
+    <script>
+      updateUI();
+
+      async function subHandler() {
+        const task = document.getElementById("ip").value;
+
+        await axios.post(
+          "http://localhost:3000/todos",
+          {
+            task: task,
+          },
+          {
+            headers: {
+              token: localStorage.getItem("token"),
+            },
+          },
+        );
+        document.getElementById("ip").value = "";
+        inf();
+      }
+
+      function updateUI() {
+        const token = localStorage.getItem("token");
+        if (token) {
+          document.getElementById("login").style.display = "none";
+          document.getElementById("logo").style.display = "block";
+          document.getElementById("main").style.display = "block";
+          inf();
+        } else {
+          document.getElementById("login").style.display = "block";
+          document.getElementById("logo").style.display = "none";
+          document.getElementById("main").style.display = "none";
+          document.getElementById("we").innerHTML = "";
+        }
+      }
+
+      async function inf() {
+        const resp = await axios.get("http://localhost:3000/me", {
+          headers: {
+            token: localStorage.getItem("token"),
+          },
+        });
+        document.getElementById("we").innerHTML = `<h1>${resp.data.msg}</h1>`;
+
+        renderTodos(resp.data.todos);
+      }
+
+      function renderTodos(todoarr) {
+        const div = document.getElementById("todos");
+        div.innerHTML = "";
+
+        todoarr.forEach((t) => {
+          div.innerHTML += `
+                <div style="margin:10px">
+                ${t.task}
+                <button onclick="deleteTodo(${t.id})">❌</button>
+                </div>
+                `;
+        });
+      }
+
+      async function deleteTodo(id) {
+        await axios.delete(`http://localhost:3000/todos/${id}`);
+
+        inf();
+      }
+
+      async function signup() {
+        const un = document.getElementById("un1").value;
+        const ps = document.getElementById("ps1").value;
+
+        await axios.post("http://localhost:3000/signup", {
+          un: un,
+          ps: ps,
+        });
+      }
+
+      async function signin() {
+        const un = document.getElementById("un2").value;
+        const ps = document.getElementById("ps2").value;
+
+        const resp = await axios.post("http://localhost:3000/signin", {
+          un: un,
+          ps: ps,
+        });
+
+        const token = resp.data.msg;
+        localStorage.setItem("token", token);
+        updateUI();
+        // console.log(token);
+      }
+
+      async function logout() {
+        localStorage.removeItem("token");
+        updateUI();
+      }
+    </script>
+  </body>
+</html>
