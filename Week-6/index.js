@@ -1,8 +1,11 @@
 const express = require('express');
+const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = "iloveaastha"
 const app = express();
 app.use(express.json());
+app.use(cors());
+
 
 const users = [];
 
@@ -18,7 +21,32 @@ const users = [];
 //     return token;
 // }
 
-app.post("/signup",(req,res)=>{
+function auth(req,res,next) {
+    const token = req.headers.token;
+    const dec = jwt.verify( token, JWT_SECRET )
+    console.log(dec.un);
+
+    if(dec.un){
+        req.un=dec.un;  
+        next()
+    }
+    else{
+        res.status(404).send({
+             msg:"Not logged in"
+        })
+    }
+}
+
+function logger(req,res,next) {
+    console.log(`The request type is ${req.method}`);
+    next();
+}
+
+app.get("/", (req,res)=>{
+    res.sendFile(__dirname+"/public/index.html")
+})
+
+app.post("/signup",logger,(req,res)=>{
     const un = req.body.un;
     const ps = req.body.ps;
 
@@ -30,9 +58,10 @@ app.post("/signup",(req,res)=>{
     res.json({
         message:"You are signed up!"
     })
+    console.log(un);
 })
 
-app.post("/signin", (req, res) => {
+app.post("/signin",logger,(req, res) => {
     const un = req.body.un;
     const ps = req.body.ps;
 
@@ -43,6 +72,7 @@ app.post("/signin", (req, res) => {
             un:un
         }, JWT_SECRET);
         // user.token = token;
+        
         res.json({
             token
         })
@@ -55,26 +85,26 @@ app.post("/signin", (req, res) => {
 });
 
 
-app.get("/me",(req,res)=>{
-    const token = req.headers.token;
-    const decodedInformation = jwt.verify(token, JWT_SECRET)
-    
-    const un = decodedInformation.un
+app.get("/me", logger,auth, (req, res) => {
+  const token = req.headers.token;
+  // const decodedInformation = jwt.verify(token, JWT_SECRET)
 
-    let user = users.find(u=>u.un===un)
+  const un = req.un;
 
-    if(user){
-        res.json({
-            un:un,
-            ps:user.ps
-        })
-    }
-    else{
-        res.status(404).send({
-            msg:"Not found"
-        })
-    }
-})
+  let user = users.find((u) => u.un === un);
+
+  if (user) {
+    res.json({
+      un: un,
+      ps: user.ps,
+    });
+  } else {
+    res.status(404).send({
+      msg: "Not found",
+    });
+  }
+});
 
 
 app.listen(3000);
+

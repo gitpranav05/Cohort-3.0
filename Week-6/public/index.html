@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="signup">
+        <div>
+            <input id="un" type="text">
+            <input id="ps" type="text">
+            
+            <button onclick="signup()">Sign-Up</button>
+        </div>
+        
+        <div>
+            <input id="un1" type="text">
+            <input id="ps1" type="text">
+            
+            <button onclick="signin()">Sign-In</button>
+        </div>
+    </div>
+        
+    <div id="logout">
+        <div id="info">
+            User info:
+            <h2 id="we"></h2>
+        </div>       
+        <div>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </div>   
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+    <script>
+        
+        updateUI()
+        function updateUI() {
+            const token=localStorage.getItem("token");
+            if(token){
+                document.getElementById("signup").style.display="none";
+                document.getElementById("logout").style.display="block";
+                inf()
+            }
+            else{
+                document.getElementById("signup").style.display="block";
+                document.getElementById("logout").style.display="none";
+                document.getElementById("we").innerHTML=""
+                
+            }
+        }
+
+        function signup(){
+            const el = document.getElementById("un");
+            const el1 = document.getElementById("ps");
+
+            axios.post("http://localhost:3000/signup",{
+                un:el.value,
+                ps:el1.value    
+            })
+
+            alert("You signed up")
+        }
+
+        async function signin(){
+            const el2 = document.getElementById("un1");
+            const el3 = document.getElementById("ps1");
+
+            const resp = await axios.post("http://localhost:3000/signin",{
+                un:el2.value,
+                ps:el3.value    
+            })
+            to=resp.data.token;
+            // console.log(to);
+            localStorage.setItem("token", to)
+            updateUI()
+            alert("You are signed in")           
+        }
+
+        async function inf() {
+            const resp2= await axios.get("http://localhost:3000/me",{
+                headers:{
+                    token: localStorage.getItem("token")
+                }
+            })
+
+            // console.log(resp2);
+            const un = resp2.data.un;
+            const ps = resp2.data.ps;
+            const ans = document.createTextNode(un);
+            document.getElementById("we").innerHTML=un
+        }
+
+        async function logout() {
+            localStorage.removeItem("token")
+            document.getElementById("we").innerHTML=""
+            updateUI()
+        }
+        
+        
+    </script>
+    
+</body>
+</html>
