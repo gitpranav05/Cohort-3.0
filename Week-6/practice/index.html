@@ -116,12 +116,39 @@
         todos.forEach((t) => {
           div.innerHTML += `
                 <div style="margin: 10px;">
-                ${t.task}
-                <button onclick="delHandler(${t.id})">❌</button>
-                </div>
+  <span id="task-${t.id}">${t.task}</span>
+
+  <button onclick="showEdit(${t.id}, '${t.task}')">✏️</button>
+  <button onclick="delHandler(${t.id})">❌</button>
+</div>
+
                 `;
         });
       }
+
+      function showEdit(id, oldTask) {
+  const span = document.getElementById(`task-${id}`);
+
+  span.innerHTML = `
+    <input id="edit-${id}" value="${oldTask}" />
+    <button onclick="saveEdit(${id})">Save</button>
+  `;
+}
+
+        async function saveEdit(id) {
+  const newTask = document.getElementById(`edit-${id}`).value;
+
+  await axios.put(`http://localhost:3000/edit/${id}`, {
+    task: newTask
+  }, {
+    headers: {
+      token: localStorage.getItem("token")
+    }
+  });
+
+  inf(); // refresh UI
+}
+
 
       async function signup() {
         try {

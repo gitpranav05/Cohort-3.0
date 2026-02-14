@@ -169,5 +169,32 @@ app.delete("/alldel",auth,(req,res)=>{
     }
 })
 
+app.put("/edit/:id", auth, (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const newTask = req.body.task;
+    const un = req.un;
+
+    const todo = todos.find((t) => t.id === id && t.un === un);
+
+    if (!todo) {
+      return res.status(404).json({
+        msg: "Todo not found",
+      });
+    }
+
+    todo.task = newTask;
+
+    res.json({
+      msg: "Todo updated",
+      todos,
+    });
+  } catch (error) {
+    res.status(500).json({
+      msg: "Something went wrong",
+    });
+  }
+});
+
 
 app.listen(3000);
