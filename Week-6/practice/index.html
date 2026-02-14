@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.6/axios.min.js"></script>
+    <div>
+      <h1>To-Do App</h1>
+    </div>
+
+    <div id="login">
+      <div>
+        <input id="un1" type="text" placeholder="username" />
+        <input id="ps1" type="text" placeholder="password" />
+        <button onclick="signup()">Sign-Up</button>
+      </div>
+      <div style="padding-top: 20px">
+        <input id="un2" type="text" placeholder="username" />
+        <input id="ps2" type="text" placeholder="password" />
+        <button onclick="signin()">Sign-In</button>
+      </div>
+    </div>
+
+    <div id="logo">
+      <div>
+        <h1>User-Information:</h1>
+        <h1 id="we"></h1>
+      </div>
+      <button onclick="logout()">Logout</button>
+
+      <div id="main" style="padding-top: 20px">
+        <input type="text" name="" id="task" />
+        <button onclick="subHandler()">Submit</button>
+        <button onclick="deleteAll()">Delete All</button>
+        <div id="todolist"></div>
+      </div>
+    </div>
+
+    <script>
+      updateUI();
+      function updateUI() {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          document.getElementById("login").style.display = "block";
+          document.getElementById("logo").style.display = "none";
+        } else {
+          document.getElementById("login").style.display = "none";
+          document.getElementById("logo").style.display = "block";
+          inf();
+        }
+      }
+
+      async function deleteAll(){
+        await axios.delete("http://localhost:3000/alldel",{
+            headers:{
+                token:localStorage.getItem("token")
+            }
+        })
+
+        updateUI()
+      }
+
+      async function delHandler(id) {
+        await axios.delete(`http://localhost:3000/delete/+${id}`,{
+            headers:{
+                token:localStorage.getItem("token")
+            }
+        }
+        )
+        updateUI(); 
+      }
+
+      function logout() {
+        localStorage.removeItem("token");
+        updateUI();
+      }
+
+      async function subHandler(){
+        const task = document.getElementById("task").value;
+
+        await axios.post("http://localhost:3000/todo",{
+            task:task
+        },{
+            headers:{
+                token:localStorage.getItem("token")
+            }
+        })
+        document.getElementById("task").value="";
+        inf()
+      }
+
+      async function inf() {
+        const resp = await axios.get("http://localhost:3000/me", {
+          headers: {
+            token: localStorage.getItem("token"),
+          },
+        });
+
+        // console.log(resp);
+        const un = resp.data.un;
+        const todos = resp.data.todos;
+        // console.log(todos);
+        document.getElementById("we").innerHTML = `${un}`;
+
+        renderTodos(todos);
+      }
+
+      async function renderTodos(todos) {
+        
+        const div = document.getElementById("todolist");
+        div.innerHTML = "";
+        todos.forEach((t) => {
+          div.innerHTML += `
+                <div style="margin: 10px;">
+                ${t.task}
+                <button onclick="delHandler(${t.id})">❌</button>
+                </div>
+                `;
+        });
+      }
+
+      async function signup() {
+        try {
+          const un = document.getElementById("un1").value;
+          const ps = document.getElementById("ps1").value;
+
+          await axios.post("http://localhost:3000/signup", {
+            un: un,
+            ps: ps,
+          });
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+      async function signin() {
+        try {
+          const un = document.getElementById("un2").value;
+          const ps = document.getElementById("ps2").value;
+
+          const resp = await axios.post("http://localhost:3000/signin", {
+            un: un,
+            ps: ps,
+          });
+
+          const token = resp.data.token;
+          localStorage.setItem("token", token);
+          updateUI();
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    </script>
+  </body>
+</html>
