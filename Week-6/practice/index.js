@@ -37,7 +37,7 @@ function auth(req,res,next) {
 
 app.get("/", (req,res)=>{
     // console.log("Working");
-    res.sendFile(__dirname+"/index.html");
+    res.sendFile(__dirname);
 })
 
 app.post("/signup",(req,res)=>{
@@ -198,3 +198,4 @@ app.put("/edit/:id", auth, (req, res) => {
 
 
 app.listen(3000);
+// console.log(__dirname);

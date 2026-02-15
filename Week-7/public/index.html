@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Todo App</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.6/axios.min.js"></script>
+</head>
+
+<body>
+
+<h1>Todo App</h1>
+
+<!-- LOGIN -->
+<div id="login">
+  <h3>Signup</h3>
+  <input id="name" placeholder="Name">
+  <input id="email1" placeholder="Email">
+  <input id="pass1" placeholder="Password">
+  <button onclick="signup()">Signup</button>
+
+  <h3>Signin</h3>
+  <input id="email2" placeholder="Email">
+  <input id="pass2" placeholder="Password">
+  <button onclick="signin()">Signin</button>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none">
+
+  <button onclick="logout()">Logout</button>
+
+  <h3>Add Todo</h3>
+  <input id="task" placeholder="Enter task">
+  <button onclick="addTodo()">Add</button>
+  <button onclick="deleteAll()">Delete All</button>
+
+  <h3>Your Todos</h3>
+  <div id="todos"></div>
+
+</div>
+
+<script>
+
+function authHeader() {
+  return {
+    token: localStorage.getItem("token")
+  };
+}
+
+function updateUI() {
+  if (localStorage.getItem("token")) {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    loadTodos();
+  } else {
+    document.getElementById("login").style.display = "block";
+    document.getElementById("app").style.display = "none";
+  }
+}
+
+updateUI();
+
+async function signup() {
+  await axios.post("http://localhost:3000/signup", {
+    name: document.getElementById("name").value,
+    email: document.getElementById("email1").value,
+    password: document.getElementById("pass1").value
+  });
+
+  alert("Signup success");
+}
+
+async function signin() {
+  const res = await axios.post("http://localhost:3000/signin", {
+    email: document.getElementById("email2").value,
+    password: document.getElementById("pass2").value
+  });
+
+  localStorage.setItem("token", res.data.token);
+  updateUI();
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  updateUI();
+}
+
+async function addTodo() {
+  await axios.post("http://localhost:3000/todo", {
+    title: document.getElementById("task").value,
+    done: false
+  }, { headers: authHeader() });
+
+  document.getElementById("task").value = "";
+  loadTodos();
+}
+
+async function loadTodos() {
+  const res = await axios.get("http://localhost:3000/todos", {
+    headers: authHeader()
+  });
+
+  render(res.data.todos);
+}
+
+function render(todos) {
+  const div = document.getElementById("todos");
+  div.innerHTML = "";
+
+  todos.forEach(t => {
+    div.innerHTML += `
+      <div>
+        <span id="t-${t._id}">${t.title}</span>
+        <button onclick="edit('${t._id}','${t.title}')">Edit</button>
+        <button onclick="deleteTodo('${t._id}')">Delete</button>
+      </div>
+    `;
+  });
+}
+
+function edit(id, title) {
+  document.getElementById(`t-${id}`).innerHTML = `
+    <input id="edit-${id}" value="${title}">
+    <button onclick="save('${id}')">Save</button>
+  `;
+}
+
+async function save(id) {
+  const val = document.getElementById(`edit-${id}`).value;
+
+  await axios.put(`http://localhost:3000/edit/${id}`, {
+    task: val
+  }, { headers: authHeader() });
+
+  loadTodos();
+}
+
+async function deleteTodo(id) {
+  await axios.delete(`http://localhost:3000/delete/${id}`, {
+    headers: authHeader()
+  });
+  loadTodos();
+}
+
+async function deleteAll() {
+  await axios.delete("http://localhost:3000/deleteall", {
+    headers: authHeader()
+  });
+  loadTodos();
+}
+
+</script>
+
+</body>
+</html>
