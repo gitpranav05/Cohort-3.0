@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Course App</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.6/axios.min.js"></script>
+</head>
+
+<body>
+
+<h1>Course Platform</h1>
+
+<hr>
+
+<h2>Signup</h2>
+<input id="suEmail" placeholder="Email">
+<input id="suName" placeholder="Name">
+<input id="suPass" placeholder="Password" type="password">
+<button onclick="signup()">Signup</button>
+
+<hr>
+
+<h2>Signin</h2>
+<input id="siEmail" placeholder="Email">
+<input id="siPass" placeholder="Password" type="password">
+<button onclick="signin()">Signin</button>
+
+<p id="tokenDisplay"></p>
+
+<hr>
+
+<h2>All Courses</h2>
+<button onclick="getCourses()">Load Courses</button>
+<div id="courses"></div>
+
+<hr>
+
+<h2>Purchased Courses</h2>
+<button onclick="getPurchased()">View Purchased</button>
+<div id="purchased"></div>
+
+<script>
+
+const BASE_URL = "http://localhost:3000"; // CHANGE IF NEEDED
+
+// ================= SIGNUP =================
+async function signup() {
+  const email = document.getElementById("suEmail").value;
+  const name = document.getElementById("suName").value;
+  const password = document.getElementById("suPass").value;
+
+  const res = await axios.post(`${BASE_URL}/user/signup`, {
+    email, name, password
+  });
+
+  alert(res.data.msg);
+}
+
+// ================= SIGNIN =================
+async function signin() {
+  const email = document.getElementById("siEmail").value;
+  const password = document.getElementById("siPass").value;
+
+  const res = await axios.post(`${BASE_URL}/user/signin`, {
+    email, password
+  });
+
+  const token = res.data.token;
+
+  localStorage.setItem("token", token);
+
+  document.getElementById("tokenDisplay").innerText = "Logged in!";
+}
+
+// ================= GET COURSES =================
+async function getCourses() {
+  const token = localStorage.getItem("token");
+
+  const res = await axios.get(`${BASE_URL}/user/courses`, {
+    headers: { token }
+  });
+
+  const courses = res.data.courses;
+  const div = document.getElementById("courses");
+  div.innerHTML = "";
+
+  courses.forEach(course => {
+    const el = document.createElement("div");
+
+    el.innerHTML = `
+      <h3>${course.title}</h3>
+      <p>Price: ${course.price}</p>
+      <img src="${course.imageLink}" width="200"/>
+      <br>
+      <button onclick="buyCourse('${course._id}')">Buy</button>
+      <hr>
+    `;
+
+    div.appendChild(el);
+  });
+}
+
+// ================= BUY COURSE =================
+async function buyCourse(id) {
+  const token = localStorage.getItem("token");
+
+  const res = await axios.post(`${BASE_URL}/user/courses/${id}`, {}, {
+    headers: { token }
+  });
+
+  alert(res.data.msg);
+}
+
+// ================= GET PURCHASED =================
+async function getPurchased() {
+  const token = localStorage.getItem("token");
+
+  const res = await axios.get(`${BASE_URL}/user/purchasedCourses`, {
+    headers: { token }
+  });
+
+  const courses = res.data.bought;
+  const div = document.getElementById("purchased");
+  div.innerHTML = "";
+
+  if (!courses) {
+    div.innerText = res.data.msg;
+    return;
+  }
+
+  courses.forEach(course => {
+    const el = document.createElement("div");
+
+    el.innerHTML = `
+      <h3>${course.title}</h3>
+      <p>Price: ${course.price}</p>
+      <img src="${course.imageLink}" width="200"/>
+      <hr>
+    `;
+
+    div.appendChild(el);
+  });
+}
+
+</script>
+
+</body>
+</html>

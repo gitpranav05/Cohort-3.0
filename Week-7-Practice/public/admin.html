@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.6/axios.min.js"></script>
+</head>
+
+<body>
+
+<h1>Admin Dashboard</h1>
+
+<hr>
+
+<h2>Admin Signup</h2>
+<input id="suEmail" placeholder="Email">
+<input id="suName" placeholder="Name">
+<input id="suPass" placeholder="Password" type="password">
+<button onclick="adminSignup()">Signup</button>
+
+<hr>
+
+<h2>Admin Signin</h2>
+<input id="siEmail" placeholder="Email">
+<input id="siPass" placeholder="Password" type="password">
+<button onclick="adminSignin()">Signin</button>
+
+<p id="status"></p>
+
+<hr>
+
+<h2>Create Course</h2>
+<input id="title" placeholder="Course Title">
+<input id="price" placeholder="Price">
+<input id="image" placeholder="Image URL">
+<button onclick="createCourse()">Create</button>
+
+<hr>
+
+<h2>All Courses</h2>
+<button onclick="getCourses()">Load Courses</button>
+<div id="courses"></div>
+
+<script>
+
+const BASE_URL = "http://localhost:3000"; // change if needed
+
+// ================= ADMIN SIGNUP =================
+async function adminSignup() {
+  const email = document.getElementById("suEmail").value;
+  const name = document.getElementById("suName").value;
+  const password = document.getElementById("suPass").value;
+
+  const res = await axios.post(`${BASE_URL}/admin/signup`, {
+    email, name, password
+  });
+
+  alert(res.data.msg);
+}
+
+// ================= ADMIN SIGNIN =================
+async function adminSignin() {
+  const email = document.getElementById("siEmail").value;
+  const password = document.getElementById("siPass").value;
+
+  const res = await axios.post(`${BASE_URL}/admin/signin`, {
+    email, password
+  });
+
+  const token = res.data.token;
+
+  localStorage.setItem("adminToken", token);
+
+  document.getElementById("status").innerText = "Admin Logged In ✅";
+}
+
+// ================= CREATE COURSE =================
+async function createCourse() {
+  const token = localStorage.getItem("adminToken");
+
+  const title = document.getElementById("title").value;
+  const price = Number(document.getElementById("price").value);
+  const imageLink = document.getElementById("image").value;
+
+  const res = await axios.post(
+    `${BASE_URL}/admin/courses`,
+    { title, price, imageLink },
+    {
+      headers: { token }
+    }
+  );
+
+  alert(res.data.msg);
+}
+
+// ================= VIEW COURSES =================
+async function getCourses() {
+  const token = localStorage.getItem("adminToken");
+
+  const res = await axios.get(`${BASE_URL}/admin/courses`, {
+    headers: { token }
+  });
+
+  const courses = res.data.courses;
+
+  const div = document.getElementById("courses");
+  div.innerHTML = "";
+
+  courses.forEach(course => {
+    const el = document.createElement("div");
+
+    el.innerHTML = `
+      <h3>${course.title}</h3>
+      <p>Price: ${course.price}</p>
+      <img src="${course.imageLink}" width="200"/>
+      <hr>
+    `;
+
+    div.appendChild(el);
+  });
+}
+
+</script>
+
+</body> 
+</html>
