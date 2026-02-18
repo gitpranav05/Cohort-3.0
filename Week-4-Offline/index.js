@@ -63,7 +63,7 @@ app.delete("/", (req,res)=>{
 function found(){
     let f=false;
     for (let i = 0; i < users[0].kidneys.length; i++) {
-      if(!users[0].kidneys[i].healthy){
+      if(!  users[0].kidneys[i].healthy){
         f=true;
         break;
       }
