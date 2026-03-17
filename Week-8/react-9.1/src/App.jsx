@@ -11,6 +11,7 @@ const Card = ({ children }) => {
         boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.1)",
       }}
     >
+      
       {children}
     </div>
   );
