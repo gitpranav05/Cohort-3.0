@@ -1,0 +1,1 @@
+{"root":["./frontend-brainly/vite.config.ts","./frontend-brainly/src/app.tsx","./frontend-brainly/src/main.tsx","./frontend-brainly/src/components/ui/button.tsx","./src/config.ts","./src/db.ts","./src/index.ts","./src/middleware.ts","./src/routes/contenroutes.ts","./src/routes/userroutes.ts"],"errors":true,"version":"6.0.2"}
