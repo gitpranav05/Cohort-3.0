@@ -69,4 +69,4 @@ app.delete("/api/v1/content", userMiddleware, delPost);
 
 app.post("/api/v1/brain/share", userMiddleware, share);
 
-app.post("/api/v1/brain/:shareLink", userMiddleware, shareLink);
+app.get("/api/v1/brain/:shareLink", shareLink);

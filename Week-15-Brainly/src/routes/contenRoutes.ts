@@ -6,7 +6,7 @@ import { ContentModel, LinkModel, UserModel } from "../db.js";
 export async function contentPost(req: Request, res: Response) {
   try {
     const userId = (req as any).id;
-    const { link, type, title } = (req as any).id;
+    const { link, type, title } = (req as any).body;
 
     if (!link || !title) {
       return res.status(400).json({
@@ -57,7 +57,7 @@ export async function delPost(req: Request, res: Response) {
       contentId,
     });
 
-    if (content?.userId !== (req as any).userId) {
+    if (content?.userId !== (req as any).id) {
       return res.status(Rescode.wrong).json({
         msg: "You don't own this document",
       });
@@ -65,7 +65,7 @@ export async function delPost(req: Request, res: Response) {
 
     await ContentModel.deleteMany({
       contentId,
-      userId: (req as any).userId,
+      userId: (req as any).id,
     });
 
     res.json({
@@ -84,28 +84,31 @@ export async function share(req: Request, res: Response) {
 
     if (share) {
       const existingLink = await LinkModel.findOne({
-        userId: (req as any).userId,
+        userId: (req as any).id,
       });
 
       if (existingLink) {
         res.json({
           hash: existingLink.hash,
+          msg: "Already existing shareable link",
         });
         return;
       }
 
       const hash = crypto.randomBytes(5).toString("hex");
+
       await LinkModel.create({
-        userId: (req as any).userId,
+        userId: (req as any).id,
         hash: hash,
       });
 
       res.json({
-        hash,
+        hash: `${hash}`,
+        msg: "Created shareable link",
       });
     } else {
       await LinkModel.deleteOne({
-        userId: (req as any).userId,
+        userId: (req as any).id,
       });
 
       res.json({
@@ -115,6 +118,7 @@ export async function share(req: Request, res: Response) {
   } catch (error) {
     res.status(Rescode.serverror).json({
       msg: "Server Error",
+      error: error,
     });
   }
 }
@@ -124,7 +128,7 @@ export async function shareLink(req: Request, res: Response) {
     const hash = req.params.shareLink as string;
 
     const link = await LinkModel.findOne({
-      hash,
+      hash: hash,
     });
 
     if (!link || !link.userId) {
@@ -137,7 +141,6 @@ export async function shareLink(req: Request, res: Response) {
       userId: link.userId,
     });
 
-    console.log(link);
     const user = await UserModel.findOne({
       _id: link.userId,
     });
@@ -156,6 +159,7 @@ export async function shareLink(req: Request, res: Response) {
   } catch (error) {
     res.status(Rescode.serverror).json({
       msg: "Server Error",
+      error: error,
     });
   }
 }
