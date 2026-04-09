@@ -53,18 +53,20 @@ export async function delPost(req: Request, res: Response) {
   try {
     const contentId = req.body.contentId;
 
-    const content = await ContentModel.findOne({
-      contentId,
+    const content = await ContentModel.findById({
+      _id: contentId,
     });
 
-    if (content?.userId !== (req as any).id) {
+    console.log(content);
+
+    if (content?.userId.toString() !== (req as any).id) {
       return res.status(Rescode.wrong).json({
         msg: "You don't own this document",
       });
     }
 
-    await ContentModel.deleteMany({
-      contentId,
+    await ContentModel.deleteOne({
+      _id:contentId,
       userId: (req as any).id,
     });
 

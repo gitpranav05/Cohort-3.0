@@ -6,8 +6,8 @@ interface ButtonProps {
   startIcon?: ReactElement;
   endIcon?: ReactElement;
   size: "sm" | "md" | "lg";
-  disabled?: boolean;
   className?: string;
+  loading?:boolean;
   onClick?: () => void;
 }
 
@@ -17,9 +17,10 @@ export function Button({
   startIcon,
   endIcon,
   size,
-  disabled,
   className,
   onClick,
+  loading
+
 }: ButtonProps) {
   const variantStyle = {
     primary: "bg-purple-600 text-white",
@@ -33,12 +34,13 @@ export function Button({
   };
 
   const defaultStyles =
-    "rounded-md px-4 py-2 flex font-light items-center justify-center  outline-none   ";
+    "rounded-md px-4 py-2 flex font-light items-center justify-center outline-none cursor-pointer  ";
 
   return (
     <button
       onClick={onClick}
-      className={`${variantStyle[variant]} ${sizeStyle[size]} ${defaultStyles} ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"} ${className} `}
+      disabled={loading}
+      className={`${variantStyle[variant]} ${sizeStyle[size]} ${defaultStyles} ${loading ? "opacity-50 hover:cursor-not-allowed " : null} ${className} `}
     >
       {startIcon ? <div className="pr-2">{startIcon}</div> : null}
       {text}

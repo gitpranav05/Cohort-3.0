@@ -80,7 +80,7 @@ export async function signIn(req: Request, res: Response) {
         msg: "User not found",
       });
     }
-    console.log(user);
+    // console.log(user);
 
     const passMatch = await bcrypt.compare(password, user.password);
 
