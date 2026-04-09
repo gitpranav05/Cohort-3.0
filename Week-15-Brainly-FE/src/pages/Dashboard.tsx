@@ -6,11 +6,13 @@ import Sidebar from "../components/Sidebar";
 import { Plus } from "../icons/Plus";
 import { Share } from "../icons/Share";
 import { useContent } from "../hooks/useContent";
+import axios from "axios";
+import { BACKEND_URL } from "../config";
 
 function Dashboard() {
   const [modalOpen, setModalOpen] = useState(false);
+  // const [shareModalOpen, setShareModalOpen] = useState(false);
   const Contents = useContent();
-  // console.log(Contents);
   return (
     <div>
       <Sidebar />
@@ -36,12 +38,28 @@ function Dashboard() {
             variant="secondary"
             text="Share Brain"
             size="md"
+            onClick={async() => {
+              const resp = await axios.post(
+                `${BACKEND_URL}/api/v1/brain/share`,
+                {
+                  share: true,
+                },
+                {
+                  headers: {
+                    token: localStorage.getItem("token"),
+                  }
+                }
+              );
+
+              const shareUrl = `http://localhost:5173/share/${resp.data.hash}`;
+
+              navigator.clipboard.writeText(shareUrl);
+            }}
             className={` hover:-translate-y-1  transition-all duration-300 `}
             startIcon={<Share size="md" />}
           />
         </div>
         <div className="flex flex-wrap py-5">
-          
           {Contents.map(({ type, link, title, _id }) => (
             <div>
               <Card title={title} type={type} link={link} divId={_id} />

@@ -57,7 +57,7 @@ export async function delPost(req: Request, res: Response) {
       _id: contentId,
     });
 
-    console.log(content);
+
 
     if (content?.userId.toString() !== (req as any).id) {
       return res.status(Rescode.wrong).json({

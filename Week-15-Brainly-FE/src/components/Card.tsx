@@ -6,38 +6,39 @@ import { Share } from "../icons/Share";
 import Twitter from "../icons/Twitter";
 import { You } from "../icons/You";
 import { BACKEND_URL } from "../config";
+import Copy from "../icons/Copy";
+import toast from "react-hot-toast";
 
-interface CardProps{
-    title: string,
-    link : string,
-    type : "twitter" | "youtube",
-    divId : string
+interface CardProps {
+  title: string;
+  link: string;
+  type: "twitter" | "youtube";
+  divId: string;
+  shared?: boolean;
 }
- 
 
-function Card({title, link, type, divId}: CardProps) {
+function Card({ title, link, type, divId, shared }: CardProps) {
   const Icon = {
-    "twitter":<Twitter size="lg"/>,
-    "youtube":<You size="lg"/>,
-    "link":<Linked size="lg"/>,
-    "document":<Notes size="lg"/>
-  }
+    twitter: <Twitter size="lg" />,
+    youtube: <You size="lg" />,
+    link: <Linked size="lg" />,
+    document: <Notes size="lg" />,
+  };
   const contentId: string = divId;
 
   async function delHandler() {
-    try{
+    try {
       const response = await axios.delete(`${BACKEND_URL}/api/v1/content`, {
-      data: {
-        contentId: contentId,
-      },
-      headers:{
-        token:localStorage.getItem("token")
-      }
-    });
-    console.log(response);
-  
-  }
-    catch(error){
+        data: {
+          contentId: contentId,
+        },
+        headers: {
+          token: localStorage.getItem("token"),
+        },
+      });
+      console.log(response);
+      toast.success("Card deleted successfully")
+    } catch (error) {
       console.log(error);
     }
   }
@@ -54,14 +55,17 @@ function Card({title, link, type, divId}: CardProps) {
             <div
               onClick={() => {
                 navigator.clipboard.writeText(link);
+                toast.success("Link Copied");
               }}
             >
-              <Share size="lg" />
+              {/* <Share size="lg" /> */}
+              <Copy size="lg"/>
             </div>
-            <div onClick={delHandler}>
-
-            <Dust size="lg" />
-            </div>
+            {!shared && (
+              <div onClick={delHandler}>
+                <Dust size="lg" />
+              </div>
+            )}
           </div>
         </div>
         {/* <h1 className="font-semibold  text-xl">Future Projects</h1> */}
@@ -80,7 +84,7 @@ function Card({title, link, type, divId}: CardProps) {
           {type === "twitter" && (
             <blockquote className="twitter-tweet">
               <a
-                href={link.replace("x", "twitter")+"?ref_src=twsrc%5Etfw"}
+                href={link.replace("x", "twitter") + "?ref_src=twsrc%5Etfw"}
               ></a>
             </blockquote>
           )}
