@@ -1,8 +1,7 @@
 import axios from "axios";
 import Dust from "../icons/Dust";
 import Linked from "../icons/Linked";
-import Notes from "../icons/Notes";
-import { Share } from "../icons/Share";
+import Notes from "../icons/Notes"; 
 import Twitter from "../icons/Twitter";
 import { You } from "../icons/You";
 import { BACKEND_URL } from "../config";
