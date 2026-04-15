@@ -1,12 +1,8 @@
 import { WebSocketServer } from "ws";
 const wss = new WebSocketServer({ port: 8081 });
-wss.on("connection", function (socket) {
-    console.log("user connected");
-    socket.on("message", (e) => {
-        if (e.toString() === "ping") {
-            socket.send("pong");
-        }
-        ;
-    });
+let userCount = 0;
+wss.on("connection", (socket) => {
+    userCount++;
+    console.log("User Connected " + userCount);
 });
 //# sourceMappingURL=index.js.map

@@ -8,14 +8,15 @@ import { Share } from "../icons/Share";
 import { useContent } from "../hooks/useContent";
 import axios from "axios";
 import { BACKEND_URL } from "../config";
+import toast from "react-hot-toast";
 
-function Dashboard() {
+function Dashboard({ setToken, token }) {
   const [modalOpen, setModalOpen] = useState(false);
   // const [shareModalOpen, setShareModalOpen] = useState(false);
   const Contents = useContent();
   return (
     <div>
-      <Sidebar />
+      <Sidebar setToken={setToken} token={token}/>
       <div className="p-4 min-h-screen  bg-[#cecbff] ml-76">
         <Modal
           open={modalOpen}
@@ -38,7 +39,7 @@ function Dashboard() {
             variant="secondary"
             text="Share Brain"
             size="md"
-            onClick={async() => {
+            onClick={async () => {
               const resp = await axios.post(
                 `${BACKEND_URL}/api/v1/brain/share`,
                 {
@@ -47,13 +48,15 @@ function Dashboard() {
                 {
                   headers: {
                     token: localStorage.getItem("token"),
-                  }
-                }
+                  },
+                },
               );
 
               const shareUrl = `http://localhost:5173/share/${resp.data.hash}`;
 
               navigator.clipboard.writeText(shareUrl);
+
+              toast.success("Successfully copied Brain link");
             }}
             className={` hover:-translate-y-1  transition-all duration-300 `}
             startIcon={<Share size="md" />}
@@ -62,7 +65,13 @@ function Dashboard() {
         <div className="flex flex-wrap py-5">
           {Contents.map(({ type, link, title, _id }) => (
             <div>
-              <Card title={title} type={type} link={link} divId={_id} />
+              <Card
+                key={_id}
+                title={title}
+                type={type}
+                link={link}
+                divId={_id}
+              />
             </div>
           ))}
         </div>
