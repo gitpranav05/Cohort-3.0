@@ -44,7 +44,9 @@ export default function App() {
   const connectToRoom = (targetRoom: string) => {
     if (wsRef.current) return; // Prevent duplicate connections
 
-    const ws = new WebSocket("ws://localhost:8081");
+    // Uses Vercel environment variable if present, otherwise defaults straight to your Render backend!
+    const WS_URL = import.meta.env.VITE_WS_URL || "wss://cohort-3-0.onrender.com";
+    const ws = new WebSocket(WS_URL);
 
     ws.onopen = () => {
       ws.send(
