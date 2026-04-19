@@ -1,107 +1,66 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const WS_URL = "ws://localhost:8081";
+export default function App() {
+  const [messages, setMessages] = useState<string[]>([
+    "hi there",
+    "Hello",
+    "hi there",
+  ]);
 
-function App() {
-  const [socket, setSocket] = useState<WebSocket | null>(null);
-  const [roomId, setRoomId] = useState("");
-  const [joined, setJoined] = useState(false);
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<string[]>([]);
+  const inpRef = useRef<HTMLInputElement>(null);
+  const wsRef = useRef<WebSocket>(null);
 
   useEffect(() => {
-    const ws = new WebSocket(WS_URL);
+    const ws = new WebSocket("ws://localhost:8081");
+    ws.onmessage = (event) => {
+      setMessages((m) => [...m, event.data]);
+    };
+    wsRef.current = ws;
 
     ws.onopen = () => {
-      console.log("Connected to server");
+      ws.send(
+        JSON.stringify({
+          type: "join",
+          payload: {
+            roomId: "red",
+          },
+        }),
+      );
     };
-
-    ws.onmessage = (event) => {
-      setMessages((prev) => [...prev, event.data]);
-    };
-
-    setSocket(ws);
-
-    return () => {
-      ws.close();
-    };
+    
   }, []);
 
-  const joinRoom = () => {
-    if (!socket) return;
-
-    socket.send(
-      JSON.stringify({
-        type: "join",
-        payload: {
-          roomId,
-        },
-      }),
-    );
-
-    setJoined(true);
-  };
-
-  const sendMessage = () => {
-    if (!socket) return;
-
-    socket.send(
-      JSON.stringify({
-        type: "chat",
-        payload: {
-          message,
-        },
-      }),
-    );
-
-    // ✅ Add your own message locally
-    setMessages((prev) => [...prev, "You: " + message]);
-
-    setMessage("");
-  };
-
   return (
-    <div style={{ padding: 20 }}>
-      <h1>WebSocket Chat</h1>
-
-      {!joined ? (
-        <div>
-          <input
-            type="text"
-            placeholder="Enter Room ID"
-            value={roomId}
-            onChange={(e) => setRoomId(e.target.value)}
-          />
-          <button onClick={joinRoom}>Join Room</button>
+    <div className="min-h-screen bg-black justify-between flex flex-col  items-center text-white">
+      <div className="w-full max-w-md">
+        <div className="">
+          <h1 className="text-2xl mb-4">Chat App</h1>
+          {messages.map((message) => (
+            <div className="bg-white text-black text-sm rounded-md p-1 m-2 w-max ">
+              {message}
+            </div>
+          ))}
         </div>
-      ) : (
-        <div>
-          <div
-            style={{
-              border: "1px solid black",
-              height: "300px",
-              overflowY: "scroll",
-              marginBottom: "10px",
-              padding: "10px",
+        <div className="flex gap-2 p-2 ">
+          <input ref={inpRef} type="text" className="w-full border" />
+          <button
+            onClick={() => {
+              const message = inpRef.current?.value;
+              wsRef.current?.send(
+                JSON.stringify({
+                  type: "chat",
+                  payload: {
+                    message: message,
+                  },
+                }),
+              );
             }}
+            className="cursor-pointer"
           >
-            {messages.map((msg, index) => (
-              <div key={index}>{msg}</div>
-            ))}
-          </div>
-
-          <input
-            type="text"
-            placeholder="Enter message"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-          />
-
-          <button onClick={sendMessage}>Send</button>
+            Send
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 }
-
-export default App;

@@ -15,8 +15,8 @@ wss.on("connection", (socket) => {
         if (parsedMessage.type === "chat") {
             let currentUserRoom = allSockets.find((x) => x.socket == socket)?.room;
             allSockets.forEach((user) => {
-                if (user.room === currentUserRoom && user.socket !== socket) {
-                    user.socket.send("Partner: " + parsedMessage.payload.message);
+                if (user.room === currentUserRoom) {
+                    user.socket.send(parsedMessage.payload.message);
                 }
             });
             //   for (let i = 0; i < allSockets.length; i++) {

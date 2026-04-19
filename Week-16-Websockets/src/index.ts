@@ -1,4 +1,3 @@
-import { all } from "axios";
 import WebSocket, { WebSocketServer } from "ws";
 
 const wss = new WebSocketServer({ port: 8081 });
@@ -27,8 +26,8 @@ wss.on("connection", (socket) => {
 
 
       allSockets.forEach((user) => {
-        if (user.room === currentUserRoom && user.socket !== socket) {
-          user.socket.send("Partner: "+parsedMessage.payload.message);
+        if (user.room === currentUserRoom  ) {
+          user.socket.send(parsedMessage.payload.message);
         }
       });
 
