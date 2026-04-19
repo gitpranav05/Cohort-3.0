@@ -1,4 +1,3 @@
-import { all } from "axios";
 import WebSocket, { WebSocketServer } from "ws";
 const wss = new WebSocketServer({ port: 8081 });
 let userCount = 0;
