@@ -1,9 +1,6 @@
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ postId: string }>;
-}) {
-  const { postId } = await params;
-
-  return <div>Blog Page {postId}</div>;
+async function page({ params }: { params: { postId: string } }) {
+  const id = (await params).postId;
+  return <div>Blog Page {id} </div>;
 }
+
+export default page;
