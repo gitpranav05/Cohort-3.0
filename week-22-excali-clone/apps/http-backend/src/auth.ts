@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express"
 import jwt from "jsonwebtoken"
+import {JWT_SECRET} from '@repo/backend-common/config'
 
-const JWT_SECRET = process.env.JWT_SECRET ?? ""
+
 
 export const auth: any = (req: Request & { id?: string }, res: Response, next: NextFunction) => {
     const token = req.headers["authorization"] ?? "";
