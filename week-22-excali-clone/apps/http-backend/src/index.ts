@@ -6,8 +6,9 @@ const app = express();
 app.use(express.json());
 
 app.post("/signup", (req, res) => {
-  //signup
-  //end
+  //jwt signing 
+  //db entry
+  //pass salting
 });
 
 app.post("/signin", (req, res) => {
