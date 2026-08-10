@@ -1,28 +1,26 @@
 import { WebSocketServer } from "ws";
 
-import jwt, { JwtPayload }  from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 const wss = new WebSocketServer({ port: 8080 });
 
-const JWT_SECRET = process.env.JWT_SECRET || ""
+const JWT_SECRET = process.env.JWT_SECRET || "";
 
 wss.on("connection", function connection(ws, request) {
   const url = request.url;
 
-  if(!url){
+  if (!url) {
     return;
   }
 
-  const queryParams = new URLSearchParams(url.split('?')[1]);
-  const token = queryParams.get('token') || "";
+  const queryParams = new URLSearchParams(url.split("?")[1]);
+  const token = queryParams.get("token") || "";
   const decoded = jwt.verify(token, JWT_SECRET);
 
-  if(!decoded || !(decoded as JwtPayload).id){
+  if (!decoded || !(decoded as JwtPayload).id) {
     ws.close();
     return;
   }
-
-
 
   ws.on("error", console.error);
 
@@ -30,6 +28,4 @@ wss.on("connection", function connection(ws, request) {
     console.log("received: %s", data);
     ws.send("ponged");
   });
-
-  
 });
