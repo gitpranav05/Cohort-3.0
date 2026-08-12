@@ -3,13 +3,19 @@
   "version": "1.0.0",
   "description": "",
   "exports": {
-    "./db": "./src/db.ts"
+    "./client": "./src/db.ts"
   },
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*"
+  },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "prisma": "^7.9.1"
+  }
 }
