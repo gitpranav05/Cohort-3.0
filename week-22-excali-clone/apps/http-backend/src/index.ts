@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import { auth } from "./auth";
 import { JWT_SECRET } from "@repo/backend-common/config";
@@ -13,7 +14,7 @@ const app = express();
 
 app.use(express.json());
 
-app.post("/signup", (req, res) => {
+app.post("/signup",async (req, res) => {
   const parsedData = CreateUserSchema.safeParse(req.body);
   if (!parsedData.success) {
     res.json({
@@ -23,7 +24,7 @@ app.post("/signup", (req, res) => {
   }
 
   try {
-    prismaClient.user.create({
+    const user = await prismaClient.user.create({
       data: {
         email: parsedData.data?.username,
         password: parsedData.data.password,
@@ -43,19 +44,32 @@ app.post("/signup", (req, res) => {
   }
 });
 
-app.post("/signin", (req, res) => {
-  const data = SignInSchema.safeParse(req.body);
-  if (!data.success) {
+app.post("/signin", async (req, res) => {
+  const parsedData = SignInSchema.safeParse(req.body);
+  if (!parsedData.success) {
     res.json({
       message: "Incorrect inputs",
     });
     return;
   }
 
-  const id = 1;
+  const user = await prismaClient.user.findFirst({
+    where: {
+      email: parsedData.data?.username,
+      password: parsedData.data.password,
+    },
+  });
+
+  if (!user) {
+    res.status(403).json({
+      message: "Not authorized",
+    });
+    return;
+  }
+
   const token = jwt.sign(
     {
-      id,
+      id:user?.id,
     },
     JWT_SECRET,
   );
