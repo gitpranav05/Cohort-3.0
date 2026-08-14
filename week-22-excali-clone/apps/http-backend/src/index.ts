@@ -9,7 +9,6 @@ import {
 } from "@repo/common/types";
 import { prismaClient } from "@repo/db/client";
 
-
 const app = express();
 
 app.use(express.json());
@@ -37,14 +36,11 @@ app.post("/signup", (req, res) => {
       password: parsedData.data.password,
       name: parsedData.data.name,
     });
-    
   } catch (error) {
     res.status(411).json({
-      message:"User already exists"
-    })
+      message: "User already exists",
+    });
   }
-
-  
 });
 
 app.post("/signin", (req, res) => {
@@ -79,6 +75,12 @@ app.post("/create-room", auth, (req, res) => {
   }
   res.json({
     roomId: 123,
+  });
+});
+
+app.get("/health", (req, res) => {
+  res.send({
+    message: "Healthy API",
   });
 });
 
