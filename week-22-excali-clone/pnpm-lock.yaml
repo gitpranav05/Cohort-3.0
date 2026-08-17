@@ -91,9 +91,15 @@ importers:
 
   apps/ws-backend:
     dependencies:
+      '@repo/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@types/jsonwebtoken':
         specifier: ^9.0.10
         version: 9.0.10
+      dotenv:
+        specifier: ^17.4.2
+        version: 17.4.2
       jsonwebtoken:
         specifier: ^9.0.3
         version: 9.0.3
@@ -145,6 +151,9 @@ importers:
       '@prisma/client':
         specifier: 7.9.1
         version: 7.9.1(prisma@7.9.1(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.2))(typescript@5.9.2)
+      '@prisma/client-runtime-utils':
+        specifier: ^7.9.1
+        version: 7.9.1
       pg:
         specifier: ^8.23.0
         version: 8.23.0
