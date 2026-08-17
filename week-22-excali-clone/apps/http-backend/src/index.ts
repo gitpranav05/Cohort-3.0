@@ -10,6 +10,14 @@ import {
 } from "@repo/common/types";
 import { prismaClient } from "@repo/db/client";
 
+declare global {
+  namespace Express {
+    interface Request {
+      id?: string;
+    }
+  }
+}
+
 const app = express();
 
 app.use(express.json());
@@ -79,17 +87,39 @@ app.post("/signin", async (req, res) => {
   });
 });
 
-app.post("/create-room", auth, (req, res) => {
-  const data = CreateRoomSchema.safeParse(req.body);
-  if (!data.success) {
+app.post("/room", auth, async (req, res) => {
+  const parsedData = CreateRoomSchema.safeParse(req.body);
+  if (!parsedData.success) {
     res.json({
       message: "Incorrect inputs",
     });
     return;
   }
-  res.json({
-    roomId: 123,
-  });
+  const uid = req.id;
+  if (!uid) {
+    res.status(401).json({
+      message: "Unauthorized",
+    });
+    return;
+  }
+  try {
+    const room = await prismaClient.room.create({
+      data:{
+        slug: parsedData.data.name ,
+        adminId: uid
+  
+      }
+    })
+    res.json({
+      roomId: room.id,
+    });
+    
+  } catch (error) {
+    res.status(404).json({
+      message:"Room already exists"
+    })
+  }
+
 });
 
 app.get("/health", (req, res) => {
