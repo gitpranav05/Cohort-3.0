@@ -9,6 +9,7 @@ import {
   CreateRoomSchema,
 } from "@repo/common/types";
 import { prismaClient } from "@repo/db/client";
+import e from "express";
 
 declare global {
   namespace Express {
@@ -19,10 +20,9 @@ declare global {
 }
 
 const app = express();
-
 app.use(express.json());
 
-app.post("/signup",async (req, res) => {
+app.post("/signup", async (req, res) => {
   const parsedData = CreateUserSchema.safeParse(req.body);
   if (!parsedData.success) {
     res.json({
@@ -46,8 +46,8 @@ app.post("/signup",async (req, res) => {
       name: parsedData.data.name,
     });
   } catch (error) {
-    res.status(411).json({
-      message: "User already exists",
+    res.status(404).json({
+      error: error,
     });
   }
 });
@@ -61,30 +61,36 @@ app.post("/signin", async (req, res) => {
     return;
   }
 
-  const user = await prismaClient.user.findFirst({
-    where: {
-      email: parsedData.data?.username,
-      password: parsedData.data.password,
-    },
-  });
-
-  if (!user) {
-    res.status(403).json({
-      message: "Not authorized",
+  try {
+    const user = await prismaClient.user.findFirst({
+      where: {
+        email: parsedData.data?.username,
+        password: parsedData.data.password,
+      },
     });
-    return;
+
+    if (!user) {
+      res.status(403).json({
+        message: "Not authorized",
+      });
+      return;
+    }
+
+    const token = jwt.sign(
+      {
+        id: user?.id,
+      },
+      JWT_SECRET,
+    );
+
+    res.json({
+      token,
+    });
+  } catch (error) {
+    res.status(404).json({
+      error: error,
+    });
   }
-
-  const token = jwt.sign(
-    {
-      id:user?.id,
-    },
-    JWT_SECRET,
-  );
-
-  res.json({
-    token,
-  });
 });
 
 app.post("/room", auth, async (req, res) => {
@@ -104,22 +110,19 @@ app.post("/room", auth, async (req, res) => {
   }
   try {
     const room = await prismaClient.room.create({
-      data:{
-        slug: parsedData.data.name ,
-        adminId: uid
-  
-      }
-    })
+      data: {
+        slug: parsedData.data.name,
+        adminId: uid,
+      },
+    });
     res.json({
       roomId: room.id,
     });
-    
   } catch (error) {
     res.status(404).json({
-      message:"Room already exists"
-    })
+      error: error,
+    });
   }
-
 });
 
 app.get("/health", (req, res) => {
