@@ -18,8 +18,8 @@ declare global {
     }
   }
 }
-
 const app = express();
+const port = 3001;
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
@@ -140,8 +140,29 @@ app.get("/chat/:roomId", async (req, res) => {
     });
 
     res.json({
-      messages
-    })
+      messages,
+    });
+  } catch (error) {
+    res.status(404).json({
+      error: error,
+    });
+  }
+});
+
+app.get("/room/:slug", async (req, res) => {
+  try {
+    const slug = req.params.slug;
+
+    const room = await prismaClient.room.findMany({
+      where: {
+        slug,
+      },
+    });
+
+    res.json({
+      room,
+    });
+    
   } catch (error) {
     res.status(404).json({
       error: error,
@@ -155,4 +176,6 @@ app.get("/health", (req, res) => {
   });
 });
 
-app.listen(3001);
+app.listen(port, () => {
+  console.log(`http server is running on : http://localhost:${port}`);
+});
