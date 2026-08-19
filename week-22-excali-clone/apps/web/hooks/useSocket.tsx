@@ -7,7 +7,7 @@ function useSocket() {
   const [socket, setSocket] = useState<WebSocket>();
 
   useEffect(()=>{
-    const ws = new WebSocket(WS_URL);
+    const ws = new WebSocket("http://localhost:8080");
     ws.onopen = () =>{
         setLoading(false);
         setSocket(ws)
