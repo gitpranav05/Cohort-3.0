@@ -7,7 +7,7 @@ export function ChatRoomClient({
   messages,
   id,
 }: {
-  messages: { messages: string }[];
+  messages: { message: string }[];
   id: string;
 }) {
   const { loading, socket } = useSocket();
@@ -27,26 +27,43 @@ export function ChatRoomClient({
         const parsedData = JSON.parse(event.data);
 
         if (parsedData.type === "chat") {
-          setChats((c) => [...c, { messages: parsedData.message }]);
+          setChats((c) => [...c, { message: parsedData.message }]);
         }
       };
     }
   }, [socket, loading, id]);
 
 
-  return <div>
-    {messages.map((m, i) => <div key={i}> {m.messages} </div>)}
+  return (
+    <div>
+      {chats.map((chat, i) => (
+        <div key={i}>{chat.message}</div>
+      ))}
 
-    <input type="text" value={currentMessage} onChange={e =>{
-        setCurrentMessage(e.target.value)
-    }} />
+      <input
+        value={currentMessage}
+        type="text"
+        className="border-amber-50 border-2  rounded-2xl p-5"
+        onChange={(e) => {
+          setCurrentMessage(e.target.value);
+        }}
+        placeholder="Room-Id"
+      />
 
-    <button onClick={()=>{
-        socket?.send(JSON.stringify({
-            type:"chat",
-            roomId:id,
-            message:currentMessage
-        }))
-    }} >Send</button>
-  </div>
+      <button
+        className="bg-gray-300 cursor-pointer text-gray-700 rounded-2xl p-5"
+        onClick={() => {
+          socket?.send(
+            JSON.stringify({
+              type: "chat",
+              roomId: id,
+              message: currentMessage,
+            }),
+          );
+        }}
+      >
+        Send
+      </button>
+    </div>
+  );
 }
