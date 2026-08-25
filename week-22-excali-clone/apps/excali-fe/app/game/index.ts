@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BACKEND_URL = process.env.BACKEND_URL;
+const NEXT_PUBLIC_BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 type Shape =
   | {
@@ -37,7 +37,7 @@ export async function initDraw(
 
     if (message.type === "chat") {
       const parsedShape = JSON.parse(message.message);
-      existingShapes.push(parsedShape);
+      existingShapes.push(parsedShape.shape);
       clearCanvas(existingShapes, canvas, ctx);
     }
   };
@@ -54,8 +54,6 @@ export async function initDraw(
     startX = e.clientX;
     startY = e.clientY;
 
-    // console.log("Mousedown", e.clientX);
-    // console.log("Mousedown", e.clientY);
   });
 
   canvas.addEventListener("mouseup", (e) => {
@@ -79,6 +77,7 @@ export async function initDraw(
         message: JSON.stringify({
           shape,
         }),
+        roomId: Number(roomId),
       }),
     );
   });
@@ -112,14 +111,12 @@ function clearCanvas(
 }
 
 async function getExistingShapes(roomId: string) {
-  const res = await axios.get(`${BACKEND_URL}/chats/${roomId}`);
+  const res = await axios.get(`${NEXT_PUBLIC_BACKEND_URL}/chat/${roomId}`);
   const messages = res.data.messages;
 
   const shapes = messages.map((x: { message: string }) => {
     const messageData = JSON.parse(x.message);
-    return {
-      type: messageData,
-    };
+    return messageData.shape;
   });
 
   return shapes;

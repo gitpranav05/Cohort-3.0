@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import Canvas from "./Canvas";
 
-const WS_URL = process.env.WS_URL;
-
+const WS_URL = process.env.NEXT_PUBLIC_WS_URL;
 export default function RoomCanvas({ roomId }: { roomId: string }) {
   const [socket, setSocket] = useState<WebSocket | null>(null);
 
@@ -21,7 +20,7 @@ export default function RoomCanvas({ roomId }: { roomId: string }) {
       ws.send(
         JSON.stringify({
           type: "join_room",
-          roomId,
+          roomId: Number(roomId),
         }),
       );
     };
