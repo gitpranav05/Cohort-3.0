@@ -42,9 +42,7 @@ app.post("/signup", async (req, res) => {
     });
 
     res.json({
-      email: parsedData.data?.username,
-      password: parsedData.data.password,
-      name: parsedData.data.name,
+      userId: user.id,
     });
   } catch (error) {
     res.status(404).json({
