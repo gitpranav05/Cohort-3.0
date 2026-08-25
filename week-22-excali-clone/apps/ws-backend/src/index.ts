@@ -60,6 +60,9 @@ wss.on("connection", function connection(ws, request) {
   ws.on("error", console.error);
 
   ws.on("message", async function message(data) {
+    try {
+
+    
     const parsedData = JSON.parse(data as unknown as string);
 
     if (parsedData.type === "join_room") {
@@ -102,5 +105,9 @@ wss.on("connection", function connection(ws, request) {
         }
       });
     }
+  }
+  catch(e){
+    console.log("Error Occured:",e);
+  }
   });
 });

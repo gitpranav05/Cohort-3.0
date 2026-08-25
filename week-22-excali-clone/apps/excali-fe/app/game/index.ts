@@ -24,9 +24,9 @@ export async function initDraw(
 ) {
   const ctx = canvas.getContext("2d");
 
-  let existingShapes: Shape[] = await getExistingShapes(roomId);
+  const existingShapes: Shape[] = await getExistingShapes(roomId);
 
-  if (!ctx) {
+  if (!ctx) { 
     return;
   }
   ctx.fillStyle = "rgba(0,0,0)";
@@ -53,7 +53,6 @@ export async function initDraw(
 
     startX = e.clientX;
     startY = e.clientY;
-
   });
 
   canvas.addEventListener("mouseup", (e) => {
