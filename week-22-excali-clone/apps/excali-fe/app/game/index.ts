@@ -17,10 +17,10 @@ type Shape =
       radius: number;
     };
 
-export function initDraw(canvas: HTMLCanvasElement) {
+export async function initDraw(canvas: HTMLCanvasElement, roomId: string) {
   const ctx = canvas.getContext("2d");
 
-  let existingShapes: Shape[] = [];
+  let existingShapes: Shape[] = await getExistingShapes(roomId);
 
   if (!ctx) {
     return;
@@ -84,7 +84,16 @@ function clearCanvas(
   });
 }
 
-function getExistingShapes(roomId: string) {
-  const res = axios.get(`${BACKEND_URL}/chats/${roomId}`);
-  const data = res.data;
+async function getExistingShapes(roomId: string) {
+  const res = await axios.get(`${BACKEND_URL}/chats/${roomId}`);
+  const messages = res.data.messages;
+
+  const shapes = messages.map((x: { message: string }) => {
+    const messageData = JSON.parse(x.message);
+    return {
+      type: messageData,
+    };
+  });
+
+  return shapes;
 }

@@ -1,26 +1,7 @@
-"use client";
+import Canvas from "@/components/Canvas";
 
-import { initDraw } from "@/app/game";
-import React, { useEffect, useRef } from "react";
+export default async function Page({ params }: { params: { roomId: string } }) {
+  const roomId = (await params).roomId;
 
-function Page() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    if (canvasRef.current) {
-      initDraw(canvasRef.current);
-    }
-  }, [canvasRef]);
-
-  return (
-    <div className="h-screen w-screen bg-white">
-      <canvas ref={canvasRef} width={2000} height={1000} />
-      <div className="absolute bottom-0 right-0">
-        <button className="bg-black text-white cursor-pointer">Rect</button>
-        <button className="bg-black text-white cursor-pointer">Circle</button>
-      </div>
-    </div>
-  );
+  return <Canvas roomId={roomId} />
 }
-
-export default Page;
