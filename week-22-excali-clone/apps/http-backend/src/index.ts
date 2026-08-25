@@ -9,7 +9,6 @@ import {
   CreateRoomSchema,
 } from "@repo/common/types";
 import { prismaClient } from "@repo/db/client";
-import e from "express";
 
 declare global {
   namespace Express {

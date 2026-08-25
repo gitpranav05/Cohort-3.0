@@ -1,3 +1,7 @@
+import axios from "axios";
+
+const BACKEND_URL = process.env.BACKEND_URL;
+
 type Shape =
   | {
       type: "rect";
@@ -78,4 +82,9 @@ function clearCanvas(
       ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
     }
   });
+}
+
+function getExistingShapes(roomId: string) {
+  const res = axios.get(`${BACKEND_URL}/chats/${roomId}`);
+  const data = res.data;
 }
