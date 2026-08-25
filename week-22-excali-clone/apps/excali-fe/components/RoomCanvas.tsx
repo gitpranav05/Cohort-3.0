@@ -11,24 +11,29 @@ export default function RoomCanvas({ roomId }: { roomId: string }) {
   useEffect(() => {
     if (!WS_URL) return;
 
-    const ws = new WebSocket(WS_URL);
+    const token =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhkODU3OTNjLTgzNTctNDc1NC04YzhkLWQwNzMxODdhZDA4NSIsImlhdCI6MTc4NzIyNTg2N30.xLeaGeGsV7gg_ESjfZz0u_5vLgE64GmlDwMABqMzXlM";
+
+    const ws = new WebSocket(`${WS_URL}?token=${token}`);
 
     ws.onopen = () => {
       setSocket(ws);
+      ws.send(
+        JSON.stringify({
+          type: "join_room",
+          roomId,
+        }),
+      );
     };
   }, []);
 
-  if(!socket){
-    return(
-      <div>
-        Connecting to server...
-      </div>
-    );
+  if (!socket) {
+    return <div>Connecting to server...</div>;
   }
 
   return (
     <div className="h-screen w-screen bg-white">
-      <Canvas roomId={roomId} />
+      <Canvas roomId={roomId} socket={socket} />
     </div>
   );
 }

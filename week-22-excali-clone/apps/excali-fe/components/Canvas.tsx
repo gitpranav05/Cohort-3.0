@@ -1,12 +1,12 @@
 import { initDraw } from "@/app/game";
 import React, { useEffect, useRef } from "react";
 
-function Canvas({ roomId }: { roomId: string }) {
+function Canvas({ roomId, socket }: { roomId: string, socket:WebSocket }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     if (canvasRef.current) {
-      initDraw(canvasRef.current, roomId);
+      initDraw(canvasRef.current, roomId, socket);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canvasRef]);
