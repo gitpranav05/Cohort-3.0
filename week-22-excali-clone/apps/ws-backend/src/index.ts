@@ -9,7 +9,7 @@ const wss = new WebSocketServer({ port: 8080 });
 
 interface User {
   ws: WebSocket;
-  rooms: string[];
+  rooms: number[];
   id: string;
 }
 
@@ -31,6 +31,11 @@ function checkUser(token: string): string | null {
   } catch (e) {
     return null;
   }
+}
+
+function parseRoomId(value: unknown): number | null {
+  const roomId = Number(value);
+  return Number.isInteger(roomId) && roomId > 0 ? roomId : null;
 }
 
 wss.on("connection", function connection(ws, request) {
@@ -70,7 +75,13 @@ wss.on("connection", function connection(ws, request) {
       if (!user) {
         return;
       }
-      user?.rooms.push(parsedData.roomId);
+      const roomId = parseRoomId(parsedData.roomId);
+      if (roomId === null) {
+        return;
+      }
+      if (!user.rooms.includes(roomId)) {
+        user.rooms.push(roomId);
+      }
     }
 
     if (parsedData.type === "leave_room") {
@@ -78,11 +89,18 @@ wss.on("connection", function connection(ws, request) {
       if (!user) {
         return;
       }
-      user.rooms = user?.rooms.filter((room) => room !== parsedData.roomId);
+      const roomId = parseRoomId(parsedData.roomId);
+      if (roomId === null) {
+        return;
+      }
+      user.rooms = user.rooms.filter((room) => room !== roomId);
     }
 
     if (parsedData.type === "chat") {
-      const roomId = parsedData.roomId;
+      const roomId = parseRoomId(parsedData.roomId);
+      if (roomId === null) {
+        return;
+      }
       const message = parsedData.message;
 
       await prismaClient.chat.create({
@@ -109,5 +127,12 @@ wss.on("connection", function connection(ws, request) {
   catch(e){
     console.log("Error Occured:",e);
   }
+  });
+
+  ws.on("close", () => {
+    const userIndex = users.findIndex((user) => user.ws === ws);
+    if (userIndex !== -1) {
+      users.splice(userIndex, 1);
+    }
   });
 });

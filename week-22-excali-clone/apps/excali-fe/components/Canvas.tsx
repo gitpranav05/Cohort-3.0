@@ -16,6 +16,11 @@ export default function Canvas({
   const [select, setSelect] = useState<Shape>("circle");
 
   useEffect(() => {
+    window.select = select;
+    // console.log(window.select);
+  }, [select]);
+
+  useEffect(() => {
     if (canvasRef.current) {
       canvasRef.current.width = window.innerWidth;
       canvasRef.current.height = window.innerHeight;
