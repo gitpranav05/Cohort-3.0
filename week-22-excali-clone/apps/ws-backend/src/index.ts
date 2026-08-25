@@ -44,7 +44,7 @@ wss.on("connection", function connection(ws, request) {
   const token = queryParams.get("token") || "";
   const id = checkUser(token);
 
-  console.log(url);
+  // console.log(url);
 
   if (!id) {
     ws.close();

@@ -33,6 +33,7 @@ export default function RoomCanvas({ roomId }: { roomId: string }) {
   return (
     <div className="h-screen w-screen bg-white">
       <Canvas roomId={roomId} socket={socket} />
+      
     </div>
   );
 }
