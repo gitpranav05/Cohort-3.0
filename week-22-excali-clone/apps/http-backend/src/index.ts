@@ -21,7 +21,7 @@ declare global {
 const app = express();
 const port = 3001;
 app.use(express.json());
-app.use(cors())
+app.use(cors());
 
 app.post("/signup", async (req, res) => {
   const parsedData = CreateUserSchema.safeParse(req.body);
@@ -135,7 +135,7 @@ app.get("/chat/:roomId", async (req, res) => {
       orderBy: {
         id: "asc",
       },
-      take: 50,
+      take: 1000,
     });
 
     res.json({
@@ -161,7 +161,6 @@ app.get("/room/:slug", async (req, res) => {
     res.json({
       room,
     });
-    
   } catch (error) {
     res.status(404).json({
       error: error,

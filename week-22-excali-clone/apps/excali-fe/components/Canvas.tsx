@@ -1,9 +1,9 @@
-import { initDraw } from "@/app/game";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IconButton } from "./Icons";
 import { Circle, Pencil, RectangleHorizontalIcon } from "lucide-react";
+import { Game } from "@/app/game/Game";
 
-type Shape = "circle" | "rect" | "pencil";
+export type Tool = "circle" | "rect" | "pencil";
 
 export default function Canvas({
   roomId,
@@ -13,21 +13,25 @@ export default function Canvas({
   socket: WebSocket;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [select, setSelect] = useState<Shape>("circle");
+  const [select, setSelect] = useState<Tool>("circle");
+  const [game, setGame] = useState<Game>();
 
   useEffect(() => {
-    window.select = select;
-    // console.log(window.select);
-  }, [select]);
+    game?.setShape(select);
+  }, [select,game]);
 
   useEffect(() => {
     if (canvasRef.current) {
       canvasRef.current.width = window.innerWidth;
       canvasRef.current.height = window.innerHeight;
-      initDraw(canvasRef.current, roomId, socket);
+      const g = new Game(canvasRef.current, roomId, socket);
+      setGame(g);
+
+      return () => {
+        g.destroy();
+      };
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canvasRef]);
+  }, [roomId, socket]);
   return (
     <div className="overflow-hidden h-screen">
       <canvas ref={canvasRef}></canvas>;
@@ -40,8 +44,8 @@ function Topbar({
   select,
   setSelect,
 }: {
-  select: Shape;
-  setSelect: (s: Shape) => void;
+  select: Tool;
+  setSelect: (s: Tool) => void;
 }) {
   return (
     <div className="fixed top-3 text-2xl  left-2 flex gap-3">
