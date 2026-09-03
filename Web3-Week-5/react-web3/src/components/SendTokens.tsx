@@ -6,7 +6,7 @@ import {
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
-import React, { useState } from "react";
+import { useState } from "react";
 
 function SendTokens() {
   const [to, setTo] = useState("");
