@@ -28,7 +28,7 @@ function App() {
             {/* Your app's components go here, nested within the context providers. */}
 
             <div className="">
-              <h1>Hello</h1>
+              {/* <h1>Hello</h1> */}
               <Airdrop />
             </div>
           </WalletModalProvider>
