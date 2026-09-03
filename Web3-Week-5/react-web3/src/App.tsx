@@ -12,6 +12,7 @@ import "@solana/wallet-adapter-react-ui/styles.css";
 import Airdrop from "./components/Airdrop";
 import { clusterApiUrl } from "@solana/web3.js";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+import SignMessage from "./components/SignMessage";
 
 const RPC =
   import.meta.env.VITE_RPC_URL ?? clusterApiUrl(WalletAdapterNetwork.Devnet);
@@ -29,7 +30,9 @@ function App() {
 
             <div className="">
               {/* <h1>Hello</h1> */}
-              <Airdrop />
+              {/* <Airdrop /> */}
+
+              <SignMessage/>
             </div>
           </WalletModalProvider>
         </WalletProvider>
