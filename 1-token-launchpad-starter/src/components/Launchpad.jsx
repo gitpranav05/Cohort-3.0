@@ -1,14 +1,20 @@
 import {
-  createInitializeMint2Instruction,
-  getMinimumBalanceForRentExemptMint,
-  MINT_SIZE,
-  TOKEN_PROGRAM_ID,
+  createInitializeMetadataPointerInstruction,
+  createInitializeMintInstruction,
+  ExtensionType,
+  getMintLen,
+  LENGTH_SIZE,
+  TOKEN_2022_PROGRAM_ID,
+  TYPE_SIZE,
 } from "@solana/spl-token";
+
+import { createInitializeInstruction, pack } from "@solana/spl-token-metadata";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { Keypair, SystemProgram, Transaction } from "@solana/web3.js";
 
-export function TokenLaunchpad() {
+export function Launchpad() {
   const wallet = useWallet();
+  //   console.log(wallet.publicKey);
   const { connection } = useConnection();
 
   async function createToken() {
@@ -16,33 +22,71 @@ export function TokenLaunchpad() {
     const symbol = document.getElementById("symbol").value;
     const imageUrl = document.getElementById("imageUrl").value;
     const initialSupply = document.getElementById("initialSupply").value;
-
-    const lamports = await getMinimumBalanceForRentExemptMint(connection);
     const keypair = Keypair.generate();
+
+    const metadata = {
+      mint: keypair.publicKey,
+      name: name,
+      symbol: symbol,
+      url: imageUrl,
+      additionalMetadata: [],
+    };
+    
+    // const metadata = {
+    //   mint: keypair.publicKey,
+    //   name: "AASTHA",
+    //   symbol: "AAST    ",
+    //   uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShnosAQhdrFSULbg9S3v_nEDm7PNCIopqnt_iQjcCNR5jRYGcK6sFDOsc&s=10",
+    //   additionalMetadata: [],
+    // };
+
+    const mintLen = getMintLen([ExtensionType.MetadataPointer]);
+    const metadataLen = TYPE_SIZE + LENGTH_SIZE + pack(metadata).length;
+
+    const lamports = await connection.getMinimumBalanceForRentExemption(
+      mintLen + metadataLen,
+    );
     const transaction = new Transaction().add(
       SystemProgram.createAccount({
         fromPubkey: wallet.publicKey,
         newAccountPubkey: keypair.publicKey,
-        space: MINT_SIZE,
+        space: mintLen ,
         lamports,
-        programId: TOKEN_PROGRAM_ID,
+        programId: TOKEN_2022_PROGRAM_ID,
       }),
-      createInitializeMint2Instruction(
+
+      createInitializeMetadataPointerInstruction(
         keypair.publicKey,
-        6,
         wallet.publicKey,
-        wallet.publicKey,
-        TOKEN_PROGRAM_ID,
+        keypair.publicKey,
+        TOKEN_2022_PROGRAM_ID,
       ),
+      createInitializeMintInstruction(
+        keypair.publicKey,
+        9,
+        wallet.publicKey,
+        null,
+        TOKEN_2022_PROGRAM_ID,
+      ),
+      createInitializeInstruction({
+        programId: TOKEN_2022_PROGRAM_ID,
+        mint: keypair.publicKey,
+        metadata: keypair.publicKey,
+        name: metadata.name,
+        symbol: metadata.symbol,
+        uri: metadata.uri,
+        mintAuthority: wallet.publicKey,
+        updateAuthority: wallet.publicKey,
+      }),
     );
 
     const recentBlockHash = await connection.getLatestBlockhash();
-    
     transaction.recentBlockhash = recentBlockHash.blockhash;
     transaction.feePayer = wallet.publicKey;
+    console.log(keypair);
     transaction.partialSign(keypair);
 
-    let res = wallet.sendTransaction(transaction, connection);
+    let res = await wallet.sendTransaction(transaction, connection);
     console.log(res);
   }
 
